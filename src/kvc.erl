@@ -134,6 +134,11 @@ get_nested_values(<<"@unionOfArrays">>, L, _R) ->
     lists:append(L);
 get_nested_values(<<"@unionOfObjects">>, L, _R) ->
     L;
+get_nested_values(<<"@i", Range/binary>>, L, R) ->
+    try get_range(Range, L)
+    catch error:_ ->
+            R
+    end;
 get_nested_values(A, L, R) when is_atom(A) andalso A > '@' andalso A < 'A' ->
     get_nested_values(atom_to_binary(A, utf8), L, R);
 get_nested_values(K="@" ++ _, L, R) ->
@@ -147,6 +152,24 @@ get_nested_values(K, [L | Rest], R) ->
     end;
 get_nested_values(_K, [], _R) ->
     [].
+
+get_range(RangeString, L) ->
+    case re:split(RangeString, ":", [{return, list}]) of
+        [Exact] ->
+            %% exact element: "@i123"
+            lists:nth(1+list_to_integer(Exact), L);
+        [Start, []] ->
+            %% offset thru end: "[123:]"
+            lists:nthtail(list_to_integer(Start), L);
+        [[], End] ->
+            %% start through offset: "[:456]"
+            lists:sublist(L, list_to_integer(End));
+        [Start, End] ->
+            %% full range: "[123:456]"
+            S = list_to_integer(Start),
+            E = list_to_integer(End),
+            lists:sublist(L, 1+S, E-S)
+    end.
 
 -spec proplist_type(term()) -> typed_proplist().
 proplist_type(P=[{K, _} | _]) ->

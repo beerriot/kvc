@@ -73,6 +73,20 @@ value_aggregate_test() ->
        kvc:value(<<"@avg">>, [], [])),
     ok.
 
+index_slice_test() ->
+    ?assertEqual(
+       2,
+       kvc:value("@i1", [1, 2, 3, 4], [])),
+    ?assertEqual(
+       [2, 3, 4],
+       kvc:value("@i1:", [1, 2, 3, 4], [])),
+    ?assertEqual(
+       [1, 2, 3],
+       kvc:value("@i:3", [1, 2, 3, 4], [])),
+    ?assertEqual(
+       [2, 3],
+       kvc:value("@i1:3", [1, 2, 3, 4], [])).
+
 path_edge_test() ->
     ?assertEqual(
        [bar],
