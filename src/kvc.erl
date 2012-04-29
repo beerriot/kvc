@@ -194,8 +194,11 @@ proplist_type_gb(D) ->
     {K, _V} = gb_trees:smallest(D),
     {{gb_tree, D}, typeof_elem(K)}.
 
-proplist_type_undefined(_) ->
-    {[], undefined}.
+proplist_type_undefined(T) ->
+    try {tuple_to_list(T), list}
+    catch error:badarg ->
+            {[], undefined}
+    end.
 
 
 first_of([F | Rest], V) ->

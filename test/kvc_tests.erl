@@ -87,6 +87,11 @@ index_slice_test() ->
        [2, 3],
        kvc:value("@i1:3", [1, 2, 3, 4], [])).
 
+index_tuple_test() ->
+    ?assertEqual(
+       1,
+       kvc:value("@i1", {foo, 1, 2, 3}, [])).
+
 path_edge_test() ->
     ?assertEqual(
        [bar],
